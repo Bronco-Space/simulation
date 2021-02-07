@@ -15,16 +15,9 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
 
         scene = context.scene
 
-        # Create an row where the buttons are aligned to each other.
-        layout.label(text="Frames:")
-
-        row = layout.row(align=True)
-        row.prop(scene, "frame_start")
-        row.prop(scene, "frame_end")
-
         # Second column, aligned
         col = layout.column(align=True)
-        col.prop(context.active_object, "rotation_euler", text="Euler Angle")
+        col.prop(bpy.data.objects['cubesat'], "location")
 
 
 
