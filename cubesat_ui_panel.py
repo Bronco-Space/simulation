@@ -15,9 +15,15 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
 
         scene = context.scene
 
-        # Second column, aligned
+        # Cubesat readout. Note: assumes cubesats name is 'cubesat'
         col = layout.column(align=True)
+        col.label(text="Cubesat")
         col.prop(bpy.data.objects['cubesat'], "location")
+        
+	# Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
+        col = layout.column(align=True)
+        col.label(text="Center of Mass")
+        col.prop(bpy.data.objects['centerofmass'], "location")
 
 
 
