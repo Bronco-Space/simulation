@@ -1,4 +1,13 @@
 import bpy
+import os
+import sys
+
+#needed to locate file containing functions
+dir = os.path.dirname(bpy.data.filepath)
+if not dir in sys.path:
+    sys.path.append(dir)
+    
+import gravity_calc as grav
 
 
 class VIEW3D_PT_cubesat(bpy.types.Panel):
@@ -20,12 +29,18 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text="Cubesat")
         col.prop(bpy.data.objects['cubesat'], "location")
         
-	# Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
+	    # Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
         col = layout.column(align=True)
         col.label(text="Center of Mass")
         col.prop(bpy.data.objects['centerofmass'], "location")
-
-
+        
+        # Readout of gravitational properties
+        a = str(grav.gravForce())
+        b = str(grav.gravAccel())
+        layout.label(text= "Gravitational Force Experienced (MicroNewtons):")
+        layout.label(text= a)
+        layout.label(text= "Gravitational Acceletation Experienced (Micrometers/sec^2):")
+        layout.label(text = b)
 
 #Stuff that is required for the script to work
 def register():
