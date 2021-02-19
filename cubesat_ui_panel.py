@@ -42,6 +42,10 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         layout.label(text= "Gravitational Acceletation Experienced (Micrometers/sec^2):")
         layout.label(text = b)
 
+	#Reload scripts
+        row = layout.row()
+        row.operator("myops.reload_scripts")
+
 #Stuff that is required for the script to work
 def register():
     bpy.utils.register_class(VIEW3D_PT_cubesat)
