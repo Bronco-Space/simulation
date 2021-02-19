@@ -20,7 +20,7 @@ def gravForce():
     gravC = (6.67408 * 10**(-11))
     unitVectR = cube / cubeR
     
-    force = -((gravC * massE *massC) / (cubeR**2)) * unitVectR * (10**6) #micronewtons
+    force = -((gravC * massE *massC) / (cubeR**2)) * unitVectR  #newtons
     
     return force
 
@@ -39,5 +39,7 @@ def gravAccel():
     gravE = ((6.67408 * 10**(-11)) * massE) / (earthR**2)
     
     unitVectR = cube / cubeR
-    accel = -(gravE * (earthR**2) / (cubeR ** 2))* unitVectR * 10**6 #micrometers/s^2
+    accel = -(gravE * (earthR**2) / (cubeR ** 2))* unitVectR #meters/s^2
+    
     return accel
+
