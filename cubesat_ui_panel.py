@@ -35,14 +35,15 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.prop(bpy.data.objects['centerofmass'], "location")
         
         # Readout of gravitational properties
-        a = str(grav.gravForce())
-        b = str(grav.gravAccel())
-        layout.label(text= "Gravitational Force Experienced (MicroNewtons):")
-        layout.label(text= a)
-        layout.label(text= "Gravitational Acceletation Experienced (Micrometers/sec^2):")
-        layout.label(text = b)
+        force = grav.gravForce()
+        acc = grav.gravAccel()
+        col = layout.column(align=True)
+        col.label(text= "Grav Force Experienced (\u00B5N):")
+        col.label(text=f'x:{round(force.x, 3)} y:{round(force.y, 3)} z:{round(force.z, 3)}')
+        col.label(text= "Grav Acc Experienced (\u00B5m/sec^2):")
+        col.label(text=f'x:{round(acc.x, 3)} y:{round(acc.y, 3)} z:{round(acc.z, 3)}')
 
-	#Reload scripts
+	    #Reload scripts
         row = layout.row()
         row.operator("myops.reload_scripts")
 
