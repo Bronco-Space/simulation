@@ -37,9 +37,9 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         # Readout of gravitational properties
         a = str(grav.gravForce())
         b = str(grav.gravAccel())
-        layout.label(text= "Gravitational Force Experienced (MicroNewtons):")
+        layout.label(text= "Gravitational Force Experienced (N):")
         layout.label(text= a)
-        layout.label(text= "Gravitational Acceletation Experienced (Micrometers/sec^2):")
+        layout.label(text= "Gravitational Acceletation Experienced (m/s^2):")
         layout.label(text = b)
 
 #Stuff that is required for the script to work

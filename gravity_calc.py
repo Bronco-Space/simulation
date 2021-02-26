@@ -2,16 +2,16 @@ import bpy
 from math import sqrt
 
 #gravitational force vector between Earth and Cubesat
+#earth is 1/10000 scale
 
 def gravForce():
     
-    cube = bpy.data.objects["cubesat"].location
+    cube = bpy.data.objects["cubesat"].location * 10000
     cubeR = sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2)) #in m
     massC = 1.75 # in kg
-    
-    
-    earthDim = bpy.data.objects["EarthSurface"].dimensions
-    earthR = earthDim[1]/2
+        
+    earthDim = bpy.data.objects["EarthSurface"].dimensions * 10000
+    earthR = earthDim[1]/2  
     dens = 5515 #kg/m^3
     volE = (4/3)*(3.14159)* (earthR)**3 #m^3
     massE = dens * volE #kg
@@ -21,17 +21,16 @@ def gravForce():
     unitVectR = cube / cubeR
     
     force = -((gravC * massE *massC) / (cubeR**2)) * unitVectR  #newtons
-    
     return force
 
 #gravitational acceleration experienced by satellite
 def gravAccel():
     
-    cube = bpy.data.objects["cubesat"].location
+    cube = bpy.data.objects["cubesat"].location * 10000
     cubeR = sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2)) #in m
     
 
-    earthDim = bpy.data.objects["EarthSurface"].dimensions
+    earthDim = bpy.data.objects["EarthSurface"].dimensions * 10000
     earthR = earthDim[1]/2
     dens = 5515 #kg/m^3
     volE = (4/3)*(3.14159)* (earthR)**3 #m^3
@@ -40,6 +39,6 @@ def gravAccel():
     
     unitVectR = cube / cubeR
     accel = -(gravE * (earthR**2) / (cubeR ** 2))* unitVectR #meters/s^2
-    
+    print(accel)
     return accel
 
