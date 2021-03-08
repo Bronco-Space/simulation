@@ -1,6 +1,19 @@
 import bpy
 import os
 import sys
+from bpy.props import (StringProperty,
+                       BoolProperty,
+                       IntProperty,
+                       FloatProperty,
+                       FloatVectorProperty,
+                       EnumProperty,
+                       PointerProperty,
+                       )
+from bpy.types import (Panel,
+                       Operator,
+                       AddonPreferences,
+                       PropertyGroup,
+                       )
 
 #needed to locate file containing functions
 dir = os.path.dirname(bpy.data.filepath)
@@ -9,6 +22,16 @@ if not dir in sys.path:
     
 import gravity_calc as grav
 
+# Custom Properties for cubesat
+# Accessible from bpy.context.scene['cubesat_props']
+# Reference: https://blender.stackexchange.com/questions/35007/how-can-i-add-a-checkbox-in-the-tools-ui
+class cubesat_property_group(PropertyGroup):
+    # Accessible from bpy.data.scenes['Scene'].cubesat_props.logging
+    logging : BoolProperty(
+        name="Enable or Disable",
+        description = "Enable logging",
+        default = False
+    )
 
 class VIEW3D_PT_cubesat(bpy.types.Panel):
     """Creates a Panel in the scene context of the properties editor"""
@@ -21,8 +44,8 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-
         scene = context.scene
+        cubesat_props = scene.cubesat_props
 
         # Cubesat readout. Note: assumes cubesats name is 'cubesat'
         col = layout.column(align=True)
@@ -43,17 +66,27 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text= "Grav Acc Experienced (m/sec^2):")
         col.label(text=f'x:{round(acc.x, 3)} y:{round(acc.y, 3)} z:{round(acc.z, 3)}')
 
+        # Logging checkbox
+        row = layout.row()
+        row.prop(cubesat_props, "logging", text="Enable Logging")
+
 	    #Reload scripts
         row = layout.row()
         row.operator("myops.reload_scripts")
 
 #Stuff that is required for the script to work
 def register():
+    bpy.utils.register_class(cubesat_property_group)
     bpy.utils.register_class(VIEW3D_PT_cubesat)
+
+    bpy.types.Scene.cubesat_props = PointerProperty(type=cubesat_property_group)
 
 
 def unregister():
     bpy.utils.unregister_class(VIEW3D_PT_cubesat)
+    bpy.utils.unregister_class(cubesat_property_group)
+
+    del bpy.types.Scene.cubesat_props
 
 
 if __name__ == "__main__":
