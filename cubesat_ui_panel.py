@@ -8,6 +8,7 @@ if not dir in sys.path:
     sys.path.append(dir)
     
 import gravity_calc as grav
+import mag_calc as mag
 
 
 class VIEW3D_PT_cubesat(bpy.types.Panel):
@@ -43,6 +44,18 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text= "Grav Acc Experienced (m/sec^2):")
         col.label(text=f'x:{round(acc.x, 3)} y:{round(acc.y, 3)} z:{round(acc.z, 3)}')
 
+        # Readout of magnetic properties
+        magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].location)
+        col = layout.column(align=True)
+        col.label(text= "North component:")
+        col.label(text='{:>+10.3f}'.format(magf[0]))
+        col.label(text= "East component:")
+        col.label(text='{:>+10.3f}'.format(magf[1]))
+        col.label(text= "Vertical component (+ve down):")
+        col.label(text='{:>+10.3f}'.format(magf[2]))
+        col.label(text= "Total intensity:")
+        col.label(text='{:>+10.3f} nT'.format(magf[3]))
+        
 	    #Reload scripts
         row = layout.row()
         row.operator("myops.reload_scripts")
