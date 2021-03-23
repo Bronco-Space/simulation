@@ -25,7 +25,7 @@ def arManager():
     global times
     global rotPos
     global dispC
-    if (len(times)) < 15: #lists need to dynamically increase in size otherwise the readout from the angular velocity function are incorrect
+    if (len(times)) < 11: #lists need to dynamically increase in size otherwise the readout from the angular velocity function are incorrect
         times.append(dispC)
         testRotate = bpy.data.objects["cubesat"]
         testRotate.rotation_euler = [dispC, dispC, dispC] #in for testing purposes
