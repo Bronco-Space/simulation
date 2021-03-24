@@ -8,12 +8,10 @@ frames = [bpy.data.objects["cubesat"].rotation_quaternion, bpy.data.objects["cub
 #angular velocity over one frame's worth of time
 def getAngVar():
     global frames
-    frames[0] = initframe
-    frames[1] = finlframe
+    initFrame = frames[0]  
+    finlFrame =  frames[1] 
     qinit = Quaternion(initFrame[0],initFrame[1],initFrame[2],initFrame[3]).normalised
     qfinal = Quaternion(finlFrame[0],finlFrame[1],finlFrame[2],finlFrame[3]).normalised
     qrot = qfinal * qinit.conjugate
     return qrot
-
-
 
