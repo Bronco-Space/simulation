@@ -12,8 +12,8 @@ def gravForce():
     massC = 1.75 # in kg
     
     
-    earthDim = bpy.data.objects["EarthSurface"].dimensions * 10000
-    earthR = earthDim[1]/2
+    earthDim = (bpy.data.objects["EarthSurface"].dimensions * 10000)/2
+    earthR = sqrt((earthDim[0]**2) + (earthDim[1]**2) + (earthDim[2]**2))
     dens = 5515 #kg/m^3
     volE = (4/3)*(3.14159)* (earthR)**3 #m^3
     massE = dens * volE #kg
@@ -33,7 +33,7 @@ def gravAccel():
     cubeR = sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2)) #in m
     
 
-    earthDim = bpy.data.objects["EarthSurface"].dimensions * 10000
+    earthDim = (bpy.data.objects["EarthSurface"].dimensions * 10000) / 2
     earthR = sqrt((earthDim[0]**2) + (earthDim[1]**2) + (earthDim[2]**2))
     dens = 5515 #kg/m^3
     volE = (4/3)*(3.14159)* (earthR)**3 #m^3
