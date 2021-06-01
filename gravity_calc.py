@@ -39,11 +39,8 @@ def gravAccel():
     volE = (4/3)*(3.14159)* (earthR)**3 #m^3
     massE = dens * volE #kg
     unitVectR = cube / cubeR
-
-    gravE = ((6.67408 * 10**(-11)) * massE) / (earthR**2) * unitVectR
-    
-    
-    accel = -(gravE * (earthR**2) / (cubeR ** 2))* unitVectR #meters/s^2
+        
+    accel = -(((6.67408 * 10**(-11)) * massE) / (cubeR ** 2))* unitVectR #meters/s^2
     return accel
 
 
