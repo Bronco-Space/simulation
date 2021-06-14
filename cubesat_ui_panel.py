@@ -1,6 +1,7 @@
 import bpy
 import os
 import sys
+import numpy
 from bpy.props import (StringProperty,
                        BoolProperty,
                        IntProperty,
@@ -48,10 +49,23 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         scene = context.scene
         cubesat_props = scene.cubesat_props
 
+        # Logging checkbox
+        row = layout.row()
+        row.prop(cubesat_props, "logging", text="Enable Logging")
+
+	    #Reload scripts
+        row = layout.row()
+        row.operator("myops.reload_scripts")
+
         # Cubesat readout. Note: assumes cubesats name is 'cubesat'
         col = layout.column(align=True)
         col.label(text="Cubesat")
         col.prop(bpy.data.objects['cubesat'], "location")
+
+        # Altitude
+        col = layout.column(align=True)
+        diffVector = bpy.data.objects['Earth'].matrix_world.translation - bpy.data.objects['cubesat'].matrix_world.translation
+        col.label(text='Altitude: {:>10.3f}'.format(numpy.linalg.norm(diffVector)))
         
 	    # Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
         col = layout.column(align=True)
@@ -63,30 +77,29 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         acc = grav.gravAccel()
         col = layout.column(align=True)
         col.label(text= "Grav Force Experienced (N):")
-        col.label(text=f'x:{round(force.x, 3)} y:{round(force.y, 3)} z:{round(force.z, 3)}')
+        col.label(text=f'x:{round(force.x, 3)}')
+        col.label(text=f'y:{round(force.y, 3)}')
+        col.label(text=f'z:{round(force.z, 3)}')
         col.label(text= "Grav Acc Experienced (m/sec^2):")
-        col.label(text=f'x:{round(acc.x, 3)} y:{round(acc.y, 3)} z:{round(acc.z, 3)}')
+        col.label(text=f'x:{round(acc.x, 3)}')
+        col.label(text=f'y:{round(acc.y, 3)}')
+        col.label(text=f'z:{round(acc.z, 3)}')
 
         # Readout of magnetic properties
         magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].location)
         col = layout.column(align=True)
-        col.label(text= "North component:")
-        col.label(text='{:>+10.3f}'.format(magf[0]))
-        col.label(text= "East component:")
-        col.label(text='{:>+10.3f}'.format(magf[1]))
-        col.label(text= "Vertical component (+ve down):")
-        col.label(text='{:>+10.3f}'.format(magf[2]))
-        col.label(text= "Total intensity:")
-        col.label(text='{:>+10.3f} nT'.format(magf[3]))
+        col.label(text='North component: {:>+10.3f}'.format(magf[0]))
+        col.label(text='East component: {:>+10.3f}'.format(magf[1]))
+        col.label(text='Vertical component (+ve down): {:>+10.3f}'.format(magf[2]))
+        col.label(text='Total intensity: {:>+10.3f} nT'.format(magf[3]))
+
+        # Time step
+        col = layout.column(align=True)
+        col.label(text="Time Step:")
+        col.prop(bpy.data.scenes["Scene"], "frame_current", text="Timestep (s/frame)")
         
 
-        # Logging checkbox
-        row = layout.row()
-        row.prop(cubesat_props, "logging", text="Enable Logging")
-
-	    #Reload scripts
-        row = layout.row()
-        row.operator("myops.reload_scripts")
+        
 
 #Stuff that is required for the script to work
 def register():
