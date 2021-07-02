@@ -68,7 +68,7 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text=f'x:{round(acc.x, 3)} y:{round(acc.y, 3)} z:{round(acc.z, 3)}')
 
         # Readout of magnetic properties
-        magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].location)
+        magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].matrix_world @ bpy.data.objects['cubesat'].location)
         col = layout.column(align=True)
         col.label(text= "North component:")
         col.label(text='{:>+10.3f}'.format(magf[0]))
