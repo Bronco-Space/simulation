@@ -65,8 +65,13 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         # Altitude
         col = layout.column(align=True)
         diffVector = bpy.data.objects['Earth'].matrix_world.translation - bpy.data.objects['cubesat'].matrix_world.translation
-        col.label(text='Altitude: {:>10.3f}'.format(numpy.linalg.norm(diffVector)))
+        col.label(text='Altitude: {:>10.3f}'.format(10*(numpy.linalg.norm(diffVector)-bpy.data.objects['EarthSurface'].dimensions[0]/2)))
         
+        col = layout.column(align=True)
+        col.label(text="Cubesat")
+        #col.prop(bpy.data.objects['cubesat'], "timestep")
+        
+    
 	    # Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
         col = layout.column(align=True)
         col.label(text="Center of Mass")
@@ -95,8 +100,7 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
 
         # Time step
         col = layout.column(align=True)
-        col.label(text="Time Step:")
-        col.prop(bpy.data.scenes["Scene"], "frame_current", text="Timestep (s/frame)")
+        col.label(text="Time Step: {:>10} (s/frame)".format(bpy.context.scene['timestep']))
         
 
         

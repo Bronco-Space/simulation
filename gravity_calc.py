@@ -4,7 +4,7 @@ from math import sqrt
 
 #gravitational force vector between Earth and Cubesat
 
-def gravForce(self):
+def gravForce():
     cube = bpy.data.objects["cubesat"].location * 10000
     cubeR = sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2)) #in m
     massC = 1.75 # in kg
@@ -22,7 +22,7 @@ def gravForce(self):
 
     return force
 
-def gravAccel(self):
+def gravAccel():
     cube = bpy.data.objects["cubesat"].location * 10000
     cubeR = sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2)) #in m
     
