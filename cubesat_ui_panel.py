@@ -23,6 +23,7 @@ if not dir in sys.path:
     
 import gravity_calc as grav
 import mag_calc as mag
+import physicsSim as phys
 
 # Custom Properties for cubesat
 # Accessible from bpy.context.scene['cubesat_props']
@@ -98,6 +99,13 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text='Vertical component (+ve down): {:>+10.3f}'.format(magf[2]))
         col.label(text='Total intensity: {:>+10.3f} nT'.format(magf[3]))
 
+        #Readout of angular velocity
+        ang = str(phys.angVarQuat)
+        print(ang)
+        col = layout.column(align=True)
+        col.label(text = "Angular Velocity:")
+        col.label(text= ang)
+        
         # Time step
         col = layout.column(align=True)
         col.label(text="Time Step: {:>10} (s/frame)".format(bpy.context.scene['timestep']))
