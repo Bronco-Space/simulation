@@ -3,7 +3,7 @@ from math import sqrt
 from pyquaternion import Quaternion
 import numpy as np
 import mathutils as mat
-import time
+
 
 #frames = [bpy.data.objects["cubesat"].rotation_quaternion, bpy.data.objects["cubesat"].rotation_quaternion]
 satQuat = bpy.data.objects["cubesat"].rotation_quaternion                                                       #initial value needed for qCurrent
