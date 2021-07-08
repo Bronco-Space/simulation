@@ -4,9 +4,9 @@ from pyquaternion import Quaternion
 import numpy as np
 import mathutils as mat
 
-frames = [bpy.data.objects["cubesat"].rotation_quaternion, bpy.data.objects["cubesat"].rotation_quaternion]
 satQuat = bpy.data.objects["cubesat"].rotation_quaternion                                                       #initial value needed for qCurrent
 qCurrent = Quaternion(satQuat[0], satQuat[1], satQuat[2], satQuat[3]).normalised 
+angVarQuat = Quaternion(1,0,0,0)
 
 class physicSim:
     
@@ -46,22 +46,10 @@ class physicSim:
         
         return accel
 
-    def getAngVar(self):
-        
-        global frames
-        
-        initFrame = frames[0]  
-        finlFrame = frames[1]  
-        qinit = Quaternion(initFrame[0],initFrame[1],initFrame[2],initFrame[3]).normalised
-        qfinal = Quaternion(finlFrame[0],finlFrame[1],finlFrame[2],finlFrame[3]).normalised
-        
-        qrot = qfinal * qinit.conjugate
-        
-        return qrot
-
-    def setAngVar(self, dx, dy, dz):
+    def AngVar(self, dx, dy, dz):
             
         global qCurrent
+        global angVarQuat
         
         self.dx = dx
         self.dy = dy
@@ -73,10 +61,20 @@ class physicSim:
         qDelta = (qx*qy*qz).normalised                                
         qNew = (qDelta * qCurrent).normalised                                                                  
         bpy.data.objects["cubesat"].rotation_quaternion = mat.Quaternion((qNew[0], qNew[1], qNew[2], qNew[3]))  #Orientation Set
+        
+        angVarQuat = qNew * qCurrent.conjugate #readout of current ang var
         qCurrent = qNew
         
         return qCurrent
 
+#test indepent of timestep
+x = 0
+a = physicSim()
+while x < 1:
+    a.AngVar(10,0,0)
+    x = x + 1
+    
+   
   
         
     
