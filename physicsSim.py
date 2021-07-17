@@ -3,6 +3,7 @@ from math import sqrt
 from pyquaternion import Quaternion
 import numpy as np
 import mathutils as mat
+from imu import test_imu
 
 satQuat = bpy.data.objects["cubesat"].rotation_quaternion                                                       #initial value needed for qCurrent
 qCurrent = Quaternion(satQuat[0], satQuat[1], satQuat[2], satQuat[3]).normalised 
@@ -64,7 +65,7 @@ class physicSim:
         
         angVarQuat = qNew * qCurrent.conjugate #readout of current ang var
         qCurrent = qNew
-        
+        test_imu.Update(angVarQuat) # UPDATES IMU AND DISPLAYS VALUES
         return qCurrent
 
 #test indepent of timestep
@@ -73,7 +74,7 @@ a = physicSim()
 while x < 1:
     a.AngVar(10,0,0)
     x = x + 1
-    
+
    
   
         
