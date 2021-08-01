@@ -3,6 +3,13 @@ from math import sqrt
 from pyquaternion import Quaternion
 import numpy as np
 import mathutils as mat
+import os
+import sys
+
+dir = os.path.dirname(bpy.data.filepath)
+if not dir in sys.path:
+    sys.path.append(dir)
+
 from imu import test_imu
 
 satQuat = bpy.data.objects["cubesat"].rotation_quaternion                                                       #initial value needed for qCurrent
@@ -71,7 +78,7 @@ class physicSim:
 #test indepent of timestep
 x = 0
 a = physicSim()
-while x < 1:
+while x < 10:
     a.AngVar(10,0,0)
     x = x + 1
 
