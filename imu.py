@@ -15,27 +15,24 @@ class IMU:
         self.gyro = ()
         self.acceleration = ()
 
-
     def Update(self, newQuat):
-        # self.UpdateMag()
+        self.UpdateMag()
         self.UpdateGyro(newQuat)
         self.UpdateAcc()
         self.DisplayValues()
 
-
     def UpdateGyro(self, newQuat):
-        if type(newQuat) == type(Quaternion(1,0,0,0)):
+        if type(newQuat) == type(Quaternion(1, 0, 0, 0)):
             self.gyro = tuple(newQuat.get_axis())
         else:
             print("IMU.UpdateGyro ERROR: parameter not of Quaternion type.")
 
-
     def UpdateAcc(self):
         # comibantion of gravity_calc and new code
 
-        sat_loc = bpy.data.objects["cubesat"].location  # don't need to scale because I'm gonna use a unit vector in the direction from the sat to the earth.
+        # don't need to scale because I'm gonna use a unit vector in the direction from the sat to the earth.
+        sat_loc = bpy.data.objects["cubesat"].location
         # earth_loc = bpy.data.objects["EarthSurface"].location
-
 
         # # calculate vector for earth's gravity acting on the sat
         # grav_vec = [earth_loc[0] - sat_loc[0], earth_loc[1] - sat_loc[1], earth_loc[2] - sat_loc[2]]
@@ -43,18 +40,18 @@ class IMU:
         # unit_grav_vec = [x / grav_vec_mag for x in grav_vec]
 
         cube = sat_loc * 10000
-        cubeR = math.sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2)) #in m
-        
+        cubeR = math.sqrt((cube[0]**2) + (cube[1]**2) + (cube[2]**2))  # in m
+
         earthDim = (bpy.data.objects["EarthSurface"].dimensions * 10000)
         earthR = earthDim[0]/2
-        dens = 5515 #kg/m^3
-        volE = (4/3)*(3.14159)* (earthR)**3 #m^3
-        massE = dens * volE #kg
+        dens = 5515  # kg/m^3
+        volE = (4/3)*(3.14159) * (earthR)**3  # m^3
+        massE = dens * volE  # kg
         unitVectR = cube / cubeR
         gravC = (6.67408 * 10**(-11))
-            
-        self.acceleration = -((gravC * massE) / (cubeR ** 2))* unitVectR #meters/s^2
-    
+
+        self.acceleration = -((gravC * massE) / (cubeR ** 2)
+                              ) * unitVectR  # meters/s^2
 
     def UpdateMag(self):
         # note this function requires that the earth be centered at the origin and oriented
@@ -83,8 +80,8 @@ class IMU:
         # mz - down component (downward toward the Earth antiparallel to surface outward normal vector)
         # mf - total intensity (nT)
 
-        self.magnetic = (mx, my, mz)
-
+        self.magnetic = (mx/1000, my/1000, mz/1000)
+        # stored in micro teslas, similar to the BNO_08X
 
     def DisplayValues(self):
         print("=== SAT IMU VALUES ===")
@@ -92,6 +89,8 @@ class IMU:
         print(" gyro = ", self.gyro)
         print(" acceleration = ", self.acceleration, "\n")
 
-        
 
-test_imu = IMU()
+if __name__ == '__main__':
+    test_imu = IMU()
+    angVarQuat = Quaternion(1, 0, 0, 0)
+    test_imu.Update(angVarQuat)
