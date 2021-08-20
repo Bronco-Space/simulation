@@ -5,7 +5,8 @@ import numpy
 import mag_calc as mag
 import mathutils
 import time
-
+import numpy as np
+import pyquaternion as q
 # These are general notes and points of reference
 #https://blenderartists.org/t/global-to-local-coordinates/506907/2
 #https://stackoverflow.com/questions/7132018/how-to-convert-global-to-local-coordinates-in-blender-2-5
@@ -57,3 +58,22 @@ def calcTorque(magf):
     # bpy.context.scene.objects.active = magVectorPoint
     # bpy.ops.transform.translate(value = vector_global_point)
     #magVectorPoint.location = vector_global_point #Solely for illustration purposes set an empty at the global coordinates of the vector end. An empty in the simulation is set to track magVectorPoint
+
+def velCtrl(torque):
+    #Cubesat Properties
+    cubesat = bpy.data.objects['cubesat']
+    m = 1.75 #kg
+    #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
+    
+    Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
+    Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
+    Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
+
+    Icm = np.array([Ixx, 0, 0, 0, Iyy, 0, 0, 0, Izz])
+    Icm = Icm.reshape((3,3))
+    
+    qw, qx, qy, qz = bpy.data.objects["cubesat"].rotation_quaternion.normalized()
+    rotQuat = q.Quaternion(qw,qx,qy,qz)
+    R = rotQuat.rotation_matrix
+    Rt = R.T
+    Irot = np.matmul( (np.matmul(R, Icm)), Rt) 
