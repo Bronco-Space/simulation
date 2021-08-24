@@ -76,4 +76,13 @@ def velCtrl(torque):
     rotQuat = q.Quaternion(qw,qx,qy,qz)
     R = rotQuat.rotation_matrix
     Rt = R.T
-    Irot = np.matmul( (np.matmul(R, Icm)), Rt) 
+    
+    t2=1 #testing with this, ask max how to handle this
+    t1=0
+    
+    trq = t2*(torque)-t1*(torque) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
+    trqT = trq.T
+    
+    u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
+    omega = np.matmul(u, trqT)
+    return omega
