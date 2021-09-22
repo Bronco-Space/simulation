@@ -19,6 +19,7 @@ import pyquaternion as q
 
 # TODO: Change to use more accurate conversions. This is based on the general estimation Chris gave in discord
 def controlSys(axis, dCycle, magf, omega):    
+    cubesat = bpy.data.objects['cubesat']
     def convertDutyCycle(axis, dCycle):
         return dCycle * 0.8
 
@@ -88,13 +89,13 @@ def controlSys(axis, dCycle, magf, omega):
         return omega
     
 
-if (cubesat.get("magX")) or (cubesat.get("magY")) or (cubesat.get("magZ")) > 0:
+    if (cubesat.get("magX")) or (cubesat.get("magY")) or (cubesat.get("magZ")) > 0: #make sure syntax is good
         torque = calcTorque(magf)
         omegaT = velCtrl(torque)
         omegaNF = omega - omegaT
-else:
+    else:
         omegaNF = omega
 
-return omegaNF
+    return omegaNF
         
 
