@@ -89,7 +89,7 @@ def controlSys(axis, dCycle, magf, omega):
         return omega
     
 
-    if (cubesat.get("magX")) or (cubesat.get("magY")) or (cubesat.get("magZ")) > 0: #make sure syntax is good
+    if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0: #make sure syntax is good
         torque = calcTorque(magf)
         omegaT = velCtrl(torque)
         omegaNF = omega - omegaT
