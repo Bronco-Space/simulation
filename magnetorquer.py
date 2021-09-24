@@ -18,9 +18,9 @@ import pyquaternion as q
 #vector_global_coord = refPoint.matrix_world @ vector_local_coord
 
 # TODO: Change to use more accurate conversions. This is based on the general estimation Chris gave in discord
-def controlSys(axis, dCycle, magf, omega):    
+def controlSys(magf, omega):    
     cubesat = bpy.data.objects['cubesat']
-    def convertDutyCycle(axis, dCycle):
+    def convertDutyCycle(dCycle):
         return dCycle * 0.8
 
     def calcTorque(magf):
@@ -43,9 +43,9 @@ def controlSys(axis, dCycle, magf, omega):
 
         # m = nIA - 
         # TODO: Ask Matteo for clarification on more detailed formula, he mentioned something about cores. Also ask about more accurate N and A
-        x_mag_dipole = convertDutyCycle("x", cubesat.get("magX")) * cubesat.get("magX_Turns") * cubesat.get("magX_A")
-        y_mag_dipole = convertDutyCycle("y", cubesat.get("magY")) * cubesat.get("magY_Turns") * cubesat.get("magY_A")
-        z_mag_dipole = convertDutyCycle("z", cubesat.get("magZ")) * cubesat.get("magZ_Turns") * cubesat.get("magZ_A")
+        x_mag_dipole = convertDutyCycle(cubesat.get("magX")) * cubesat.get("magX_Turns") * cubesat.get("magX_A")
+        y_mag_dipole = convertDutyCycle(cubesat.get("magY")) * cubesat.get("magY_Turns") * cubesat.get("magY_A")
+        z_mag_dipole = convertDutyCycle(cubesat.get("magZ")) * cubesat.get("magZ_Turns") * cubesat.get("magZ_A")
 
         magnetorquer_vector = mathutils.Vector((x_mag_dipole, y_mag_dipole, z_mag_dipole))
         torque_vector = vector_cube_local_point.cross(magnetorquer_vector)
