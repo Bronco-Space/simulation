@@ -78,14 +78,15 @@ def controlSys(magf, omega):
         R = rotQuat.rotation_matrix
         Rt = R.T
         
-        t2= bpy.data.scenes["Scene"], "frame_current" #the timestep interval amount
+        t2= 1 #the timestep interval amount
         t1=0
         
         trq = t2*(torque)-t1*(torque) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
         trqT = trq.T
         
         u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
-        omega = np.matmul(u, trqT)
+        omega = to_quaternion(np.matmul(u, trqT))
+        
         return omega
     
 
