@@ -88,17 +88,17 @@ def velCtrl(torque):
     t1=0
     
     trq = t2*(torque)-t1*(torque) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
-    trqT = trq.T
+    trqT = np.transpose(trq)
     
     u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
-    omega = to_quaternion(np.matmul(u, trqT))
+    omega = np.matmul(u, trqT)
     
     return omega
 
-def controlsys(torque, omega) 
+def controlSys(torque, omega): 
     if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0: #make sure syntax is good
         omegaT = velCtrl(torque)
-        omegaNF = omega - omegaT #nf = new frame
+        omegaNF = 0 #omega - omegaT #nf = new frame
     else:
         omegaNF = omega
 
