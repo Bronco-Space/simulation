@@ -95,13 +95,3 @@ def velCtrl(torque):
     
     return omega
 
-def controlSys(torque, omega): 
-    if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0: #make sure syntax is good
-        omegaT = velCtrl(torque)
-        #omegaNF = omega - omegaT #nf = new frame
-    else:
-        #omegaNF = omega
-
-    #return omegaNF
-            
-
