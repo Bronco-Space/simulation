@@ -22,16 +22,12 @@ def getAngVar():
     
     return qrot
 
-def setAngVar(dx, dy, dz):
+def setAngVar(velQuat):
             
     global qCurrent
     global frames
     
-    qx = Quaternion(axis=(1.0, 0.0, 0.0), degrees = dx).normalised
-    qy = Quaternion(axis=(0.0, 1.0, 0.0), degrees = dy).normalised
-    qz = Quaternion(axis=(0.0, 0.0, 1.0), degrees = dz).normalised
-    
-    qDelta = (qx*qy*qz).normalised                                
+    qDelta = velQuat.normalised                                
     qNew = (qDelta * qCurrent).normalised                                                                  
     bpy.data.objects["cubesat"].rotation_quaternion = mat.Quaternion((qNew[0], qNew[1], qNew[2], qNew[3]))  #Orientation Set
     qCurrent = qNew
