@@ -17,15 +17,16 @@ while x < 1:
     magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].location)
     torque = magT.calcTorque(magf)
     torqueAR = np.array([torque[0], torque[1], torque[2]])
-    
+    print("this is small lmao", torqueAR[1])
     
     omega = magT.velCtrl(torqueAR)
     #aVel.setAngVar(10,10,10)
     #print(aVel.getAngVar())
     print("uWu", torque)
-    print("OwO", omega)
-    
-
+    print("Quat Real", omega[0])
+    print("Quat x", omega[1])
+    print("Quat y", omega[2])
+    print("Quat z", omega[3])
 #    print("UwU", torque)
 
     with open('output.csv', mode='w', newline='') as logs:
