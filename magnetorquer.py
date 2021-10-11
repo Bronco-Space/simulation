@@ -30,7 +30,7 @@ def convertDutyCycle(dCycle):
 def calcTorque(magf):
     #This is just to make it obvious that a new line in the console has been printed
     
-    magf = [item * (10**(-9)) for item in magf]
+    magf = [item * (10**(-9)) for item in magf] #converts from microtesla to tesla
     print(time.time() % 100)
     magComp = {
         "north": magf[0],
@@ -38,7 +38,7 @@ def calcTorque(magf):
         "down": magf[2],
         "intensity": magf[3]
     }
-    print("test north", magf)
+    
     cubesat = bpy.data.objects['cubesat']
     magRef = bpy.data.objects['magRef']
 
@@ -46,7 +46,7 @@ def calcTorque(magf):
     vector_ref_local_point = mathutils.Vector((magComp["north"], magComp["east"], magComp["down"])) #The point in magRef's local space the vector points to
     vector_global_point = magRef.matrix_world @ vector_ref_local_point#The point in global space the vector points to
     vector_cube_local_point = cubesat.matrix_world.inverted() @ vector_global_point #The point in cubesat's local space the vector points to
-    print("vector i think", vector_cube_local_point)
+    
     # m = nIA - 
     # TODO: Ask Matteo for clarification on more detailed formula, he mentioned something about cores. Also ask about more accurate N and A
     x_mag_dipole = convertDutyCycle(cubesat.get("magX")) * cubesat.get("magX_Turns") * cubesat.get("magX_A")
@@ -89,10 +89,10 @@ def velCtrl(torque):
     
     trq = t2*(torque)-t1*(torque) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
     trqT = np.transpose(trq)
-    print("lmao", trqT)
+    
     u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
     omega = np.matmul(u, trqT)
-    print("oop", omega)
+    
     omegaE = mathutils.Euler((omega[0], omega[1], omega[2]), "XYZ") #radians per second
     omegaQ = omegaE.to_quaternion()    
     return omegaQ
