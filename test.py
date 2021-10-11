@@ -19,9 +19,10 @@ while x < 1:
     torqueAR = np.array([torque[0], torque[1], torque[2]])
     
     
-    #omega = magT.controlSys(torqueAR, aVel.getAngVar())
+    omega = magT.velCtrl(torqueAR)
     #aVel.setAngVar(10,10,10)
     #print(aVel.getAngVar())
+    print("uWu", torque)
     print("OwO", omega)
     
 
