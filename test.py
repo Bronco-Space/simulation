@@ -10,7 +10,7 @@ import pyquaternion as q
 qtest = q.Quaternion(0.9885986, 0.0869346, 0.0869346, 0.0869346)
 
 x = 0
-while x < 1:
+while x < 10:
    
     print(qtest)
     aVel.setAngVar(qtest) #does this need to be quaternion?
@@ -19,14 +19,11 @@ while x < 1:
     torqueAR = np.array([torque[0], torque[1], torque[2]])
  
     
-    omega = magT.velCtrl(torqueAR)
+    omega = magT.controlSys(torqueAR, qtest)
     #aVel.setAngVar(10,10,10)
-    #print(aVel.getAngVar())
+    print("ang var", aVel.getAngVar())
     print("torque", torque)
-    print("Quat Real", omega[0])
-    print("Quat x", omega[1])
-    print("Quat y", omega[2])
-    print("Quat z", omega[3])
+   
 
 
     with open('output.csv', mode='w', newline='') as logs:

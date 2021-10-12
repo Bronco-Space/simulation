@@ -78,7 +78,7 @@ def velCtrl(torque):
 
     Icm = np.array([Ixx, 0, 0, 0, Iyy, 0, 0, 0, Izz])
     Icm = Icm.reshape((3,3))
-    print("moment", Icm)
+   
     qw, qx, qy, qz = bpy.data.objects["cubesat"].rotation_quaternion.normalized()
     rotQuat = q.Quaternion(qw,qx,qy,qz)
     R = rotQuat.rotation_matrix
@@ -94,14 +94,14 @@ def velCtrl(torque):
     omega = np.matmul(u, trqT)
     
     omegaE = mathutils.Euler((omega[0], omega[1], omega[2]), "XYZ") #radians per second
-    omegaQ = omegaE.to_quaternion()    
+    omegaQ = omegaE.to_quaternion()
+    omegaQ = q.Quaternion(omegaQ[0], omegaQ[1], omegaQ[2], omegaQ[3])    
     return omegaQ
 
-'''
+
 def controlSys(torque, omega):      
     if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0: #make sure syntax is good         
         omegaT = velCtrl(torque)         
         omegaNF = omega - omegaT #nf = new frame    
     else:         
         omegaNF = omega      #return omegaNF       
-'''
