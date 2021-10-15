@@ -5,12 +5,13 @@ import bpy
 import csv
 import numpy as np
 import pyquaternion as q
+import mathutils
 
 
 qtest = q.Quaternion(0.9885986, 0.0869346, 0.0869346, 0.0869346)
 
 x = 0
-while x < 10:
+while x < 54000:
    
     print(qtest)
     aVel.setAngVar(qtest) #does this need to be quaternion?
@@ -25,11 +26,19 @@ while x < 10:
     print("torque", torque)
    
 
-
-    with open('output.csv', mode='w', newline='') as logs:
-        logs = csv.writer(logs, delimiter=',')
-        logs.writerows('1,2,3')
+    tempAngVar = aVel.getAngVar()
+    #quaternion = mathutils.Quaternion([tempAngVar[0], tempAngVar[1], tempAngVar[2], tempAngVar[3]])
+    #euler = quaternion.to_euler('XYZ')
+    with open('angVel.csv', mode='a+', newline='\n') as logs:
+        writer = csv.writer(logs)
+        writer.writerow([f'{tempAngVar[0]:.20f}',f'{tempAngVar[1]:.20f}',f'{tempAngVar[2]:.20f}',f'{tempAngVar[3]:.20f}'])
+    
+    with open('torque.csv', mode='a+', newline='\n') as logs:
+        writer = csv.writer(logs)
+        writer.writerow([f'{torqueAR[0]:.20f}', f'{torqueAR[1]:.20f}', f'{torqueAR[2]:.20f}'])
+    
     #aVel.setAngVar(omega[0], omega[1], omega[2])
 
     #print("test", magT.convertDutyCycle(bpy.data.objects['cubesat'].get("magX")))
     x = x + 1
+
