@@ -22,8 +22,15 @@ while x < 10:
     omega = magT.controlSys(torqueAR, qtest)
     #aVel.setAngVar(10,10,10)
     print("ang var", aVel.getAngVar())
-    print("torque", torque)
-   
+    print("torque", torqueAR)
+    a =  aVel.getAngVar()[0]
+    b =  aVel.getAngVar()[1]
+    c =  aVel.getAngVar()[2]
+    d =  aVel.getAngVar()[3]
+    print("w", a)
+    print("x", b)
+    print("y", c)
+    print("z", d) 
 
 
     with open('output.csv', mode='w', newline='') as logs:

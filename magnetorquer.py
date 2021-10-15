@@ -25,7 +25,7 @@ import pyquaternion as q
     
 cubesat = bpy.data.objects['cubesat']
 def convertDutyCycle(dCycle):
-    return dCycle * 0.008
+    return dCycle * 0.8
 
 def calcTorque(magf):
     #This is just to make it obvious that a new line in the console has been printed
@@ -93,9 +93,12 @@ def velCtrl(torque):
     u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
     omega = np.matmul(u, trqT)
     
-    omegaE = mathutils.Euler((omega[0], omega[1], omega[2]), "XYZ") #radians per second
-    omegaQ = omegaE.to_quaternion()
-    omegaQ = q.Quaternion(omegaQ[0], omegaQ[1], omegaQ[2], omegaQ[3])    
+    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = omega[0]).normalised
+    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = omega[1]).normalised
+    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = omega[2]).normalised
+        
+    omegaQ = (qx*qy*qz).normalised 
+     
     return omegaQ
 
 
