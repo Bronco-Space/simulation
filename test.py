@@ -8,10 +8,10 @@ import pyquaternion as q
 import mathutils
 
 
-qtest = q.Quaternion(0.9885986, 0.0869346, 0.0869346, 0.0869346)
+qtest = q.Quaternion(1, 0, 0, 0)
 
 x = 0
-while x < 54000:
+while x < 500:
    
     print(qtest)
     aVel.setAngVar(qtest) #does this need to be quaternion?

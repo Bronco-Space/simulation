@@ -25,12 +25,13 @@ import pyquaternion as q
     
 cubesat = bpy.data.objects['cubesat']
 def convertDutyCycle(dCycle):
-    return dCycle * 0.8
+    return dCycle * 0.05
 
 def calcTorque(magf):
     #This is just to make it obvious that a new line in the console has been printed
     
     magf = [item * (10**(-9)) for item in magf] #converts from microtesla to tesla
+    print("magf", magf)
     print(time.time() % 100)
     magComp = {
         "north": magf[0],
@@ -50,9 +51,12 @@ def calcTorque(magf):
     # m = nIA - 
     # TODO: Ask Matteo for clarification on more detailed formula, he mentioned something about cores. Also ask about more accurate N and A
     x_mag_dipole = convertDutyCycle(cubesat.get("magX")) * cubesat.get("magX_Turns") * cubesat.get("magX_A")
-    y_mag_dipole = convertDutyCycle(cubesat.get("magY")) * cubesat.get("magY_A")
-    z_mag_dipole = convertDutyCycle(cubesat.get("magZ")) * cubesat.get("magZ_A")
-    print("oop212", x_mag_dipole)
+    y_mag_dipole = convertDutyCycle(cubesat.get("magY")) * cubesat.get("magY_Turns") * cubesat.get("magY_A")
+    z_mag_dipole = convertDutyCycle(cubesat.get("magZ")) * cubesat.get("magZ_Turns") * cubesat.get("magZ_A")
+    print("xdipole", x_mag_dipole)
+    print("ydipole", y_mag_dipole)
+    print("zdipole", z_mag_dipole)
+    
     magnetorquer_vector = mathutils.Vector((x_mag_dipole, y_mag_dipole, z_mag_dipole))
     torque_vector = vector_cube_local_point.cross(magnetorquer_vector)
     print(f'vector_global_point {vector_global_point}')
