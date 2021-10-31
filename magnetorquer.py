@@ -75,7 +75,7 @@ def velCtrl(torque):
     cubesat = bpy.data.objects['cubesat']
     m = 1.75 #kg
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
-    
+    torque = np.array([[torque]])
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
     Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
     Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
@@ -88,13 +88,17 @@ def velCtrl(torque):
     R = rotQuat.rotation_matrix
     Rt = R.T
     
-    t2= 1 #the timestep interval amount
-    t1=0
     
-    trq = t2*(torque)-t1*(torque) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
-    trqT = np.transpose(trq)
+    t2 = 1#the timestep interval amount
+    t1 = 0
     
+    trq = (t2*(torque))-(t1*(torque)) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
+    trqT = trq.T
+    
+    
+    print("trqT\n", trqT)
     u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
+    print("u\n", u)
     omega = np.matmul(u, trqT)
     
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = omega[0]).normalised

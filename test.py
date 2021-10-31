@@ -11,7 +11,7 @@ import mathutils
 qtest = q.Quaternion(1, 0, 0, 0)
 
 x = 0
-while x < 500:
+while x < 10:
    
     print(qtest)
     aVel.setAngVar(qtest) #does this need to be quaternion?
