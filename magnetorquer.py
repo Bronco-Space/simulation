@@ -75,7 +75,8 @@ def velCtrl(torque):
     cubesat = bpy.data.objects['cubesat']
     m = 1.75 #kg
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
-    torque = np.array([[torque]])
+    torque = torque.reshape((3,1))
+    print("torque dimensions", torque.shape)
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
     Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
     Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
@@ -93,14 +94,12 @@ def velCtrl(torque):
     t1 = 0
     
     trq = (t2*(torque))-(t1*(torque)) #"integration" for torque wrt time (as the torque value passed in is not a function of time)
-    trqT = trq.T
     
     
-    print("trqT\n", trqT)
     u = np.linalg.inv(np.linalg.multi_dot([R, Icm, Rt]))
     print("u\n", u)
-    omega = np.matmul(u, trqT)
-    
+    omega = np.matmul(u, trq)
+    print("omega", omega)
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = omega[0]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = omega[1]).normalised
     qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = omega[2]).normalised
@@ -110,9 +109,14 @@ def velCtrl(torque):
     return omegaQ
 
 
-def controlSys(torque, omega):      
-    if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0: #make sure syntax is good         
-        omegaT = velCtrl(torque)         
-        omegaNF = omega - omegaT #nf = new frame    
+def controlSys(torque, omega, direction):                                           #direction is a true/false value determined by the ai
+    if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0:
+       
+        omegaT = velCtrl(torque)    
+        
+        if direction == True:          
+            omegaNF = omega - omegaT #nf = new frame    
+        else:
+            omegaNF = omega + omegaT
     else:         
         omegaNF = omega      #return omegaNF       
