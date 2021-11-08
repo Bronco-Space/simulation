@@ -85,16 +85,16 @@ def velCtrl(torque):
   
 
     time = 1 #timestep
-    t = sympy.Symbol("t")
+    t = sympy.symbols("t")
 
-    Ix, Iy, Iz = sympy.Symbol("Ix Iy Iz")
+    Ix, Iy, Iz = sympy.symbols("Ix Iy Iz")
     
-    wx, wy, wz = sympy.Symbol("wx wy wz")
+    wx, wy, wz = sympy.symbols("wx wy wz")
     
 
-    alx, aly, alz = sympy.Symbol("alx, aly, alz")
+    alx, aly, alz = sympy.symbols("alx, aly, alz")
     
-    Tx, Ty, Tz = sympy.Symbol("Tx, Ty, Tz")
+    Tx, Ty, Tz = sympy.symbols("Tx, Ty, Tz")
     
 
     ax = (Tx - ((Iy-Iz)*wy*wz))/Ix
