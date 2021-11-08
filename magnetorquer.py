@@ -26,7 +26,7 @@ import sympy
     
 cubesat = bpy.data.objects['cubesat']
 def convertDutyCycle(dCycle):
-    return dCycle * 0.05
+    return dCycle * 0.8
 
 def calcTorque(magf):
     #This is just to make it obvious that a new line in the console has been printed
