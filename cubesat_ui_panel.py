@@ -23,7 +23,7 @@ if not dir in sys.path:
     
 import gravity_calc as grav
 import mag_calc as mag
-import physicsSim as phys
+import magnetorquer
 
 # Custom Properties for cubesat
 # Accessible from bpy.context.scene['cubesat_props']
@@ -66,13 +66,8 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         # Altitude
         col = layout.column(align=True)
         diffVector = bpy.data.objects['Earth'].matrix_world.translation - bpy.data.objects['cubesat'].matrix_world.translation
-        col.label(text='Altitude: {:>10.3f}'.format(10*(numpy.linalg.norm(diffVector)-bpy.data.objects['EarthSurface'].dimensions[0]/2)))
+        col.label(text='Altitude: {:>10.3f}'.format(numpy.linalg.norm(diffVector)))
         
-        col = layout.column(align=True)
-        col.label(text="Cubesat")
-        #col.prop(bpy.data.objects['cubesat'], "timestep")
-        
-    
 	    # Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
         col = layout.column(align=True)
         col.label(text="Center of Mass")
@@ -92,23 +87,19 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text=f'z:{round(acc.z, 3)}')
 
         # Readout of magnetic properties
-        magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].matrix_world @ bpy.data.objects['cubesat'].location)
+        magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].location)
         col = layout.column(align=True)
         col.label(text='North component: {:>+10.3f}'.format(magf[0]))
         col.label(text='East component: {:>+10.3f}'.format(magf[1]))
         col.label(text='Vertical component (+ve down): {:>+10.3f}'.format(magf[2]))
         col.label(text='Total intensity: {:>+10.3f} nT'.format(magf[3]))
-
-        #Readout of angular velocity
-        ang = str(phys.angVarQuat)
-        print(ang)
-        col = layout.column(align=True)
-        col.label(text = "Angular Velocity:")
-        col.label(text= ang)
+        stuff = magnetorquer.calcTorque(magf)
+        col.label(text=f'stuff: ({stuff[0]:>+.0f},{stuff[1]:>+.0f},{stuff[2]:>+.0f})')
         
         # Time step
         col = layout.column(align=True)
-        col.label(text="Time Step: {:>10} (s/frame)".format(bpy.context.scene['timestep']))
+        col.label(text="Time Step:")
+        col.prop(bpy.data.scenes["Scene"], "frame_current", text="Timestep (s/frame)")
         
 
         
