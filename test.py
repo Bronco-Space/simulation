@@ -21,7 +21,7 @@ while x < 10:
  
     
     omega = magT.controlSys(torqueAR, qtest, direction)
-    aVel.setAngVar(omega)
+    #aVel.setAngVar(10,10,10)
     print("ang var", aVel.getAngVar())
     print("torque", torqueAR)
     a =  aVel.getAngVar()[0]
