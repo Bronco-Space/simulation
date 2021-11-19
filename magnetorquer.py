@@ -121,6 +121,7 @@ def velCtrl(torque):
     qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][2]).normalised
         
     omegaQ = (qx*qy*qz).normalised 
+    print("print", omegaQ)
     return omegaQ
 
 
@@ -134,4 +135,6 @@ def controlSys(torque, omega, direction):                                       
         else:
             omegaNF = omega + omegaT
     else:         
-        omegaNF = omega      #return omegaNF       
+        omegaNF = omega      
+    
+    return omegaNF       
