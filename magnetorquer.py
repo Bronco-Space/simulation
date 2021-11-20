@@ -116,6 +116,11 @@ def velCtrl(torque):
 
     ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
     print("these are the rads", ans)
+
+    if (cubesat.get("magX")) > 0: -ans[0][wx]
+    if (cubesat.get("magY")) > 0: -ans[0][wy]
+    if (cubesat.get("magZ")) > 0: -ans[0][wz]
+
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
     qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][wz]).normalised
@@ -219,10 +224,14 @@ def reactWhl(Tm):
     eq_wx = sympy.Eq(eq_wx, wx)
     eq_wy = sympy.Eq(eq_wy, wy)
     eq_wz = sympy.Eq(eq_wz, wz)
-
     
     ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
     print("ans:", ans)
+
+    if (cubesat.get("dWx")) > 0: -ans[0][wx]
+    if (cubesat.get("dWy")) > 0: -ans[0][wy]
+    if (cubesat.get("dWz")) > 0: -ans[0][wz]
+
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
     qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][wz]).normalised
@@ -231,28 +240,16 @@ def reactWhl(Tm):
 
 def controlSysMag(torque, omega, direction):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0:
-       
-        omegaT = velCtrl(torque)    
-        
-        if direction == True:          
-            omegaNF = omega - omegaT #nf = new frame    
-        else:
-            omegaNF = omega + omegaT
+        omegaT = velCtrl(torque)            
+        omegaNF = omega + omegaT #nf = new frame    
     else:         
         omegaNF = omega      
-    
     return omegaNF       
 
 def controlSysReact(torque, omega, direction):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("dWx")) > 0 or (cubesat.get("dWy")) > 0 or (cubesat.get("dWz")) > 0:
-       
-        omegaRW = reactWhl(torque)    
-        
-        if direction == True:          
-            omegaNF = omega + omegaRW #nf = new frame    
-        else:
-            omegaNF = omega - omegaRW
+        omegaRW = reactWhl(torque)             
+        omegaNF = omega + omegaRW #nf = new frame    
     else:         
         omegaNF = omega      
-    
     return omegaNF       
