@@ -20,7 +20,7 @@ while x < 10:
     torqueAR = np.array([torque[0], torque[1], torque[2]])
  
     
-    omega = magT.controlSysMag(torqueAR, qtest, direction)
+    omega = magT.controlSysReact(torqueAR, qtest, direction)
     aVel.setAngVar(omega)
     print("ang var", aVel.getAngVar())
     print("torque that matters", torqueAR)
