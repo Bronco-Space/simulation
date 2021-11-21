@@ -150,7 +150,7 @@ def reactWhl(Tm):
 
     #board properties
     board_current = 0.8
-    max_angvel = 4000
+    max_angvel = 12000
 
     #duty cycle for wheels
     dc_x = convertDutyCycle(cubesat.get("dWx"))
@@ -219,14 +219,10 @@ def reactWhl(Tm):
     ax = (Tx - ((Iy - Iz)*wz*wy) + (hw_z*wy) - (hw_y*wz))/Ix
     ay = (Ty - ((Iz - Ix)*wx*wz) + (hw_x*wz) - (hw_z*wx))/Iy
     az = (Tz - ((Ix - Iy)*wy*wx) + (hw_y*wx) - (hw_x*wy))/Iz
-    print("Tx, Ty, Tz", Tx, Ty, Tz)
-    print("Ixx, Iyy, Izz", Ixx, Iyy, Izz)
-    print("hw_x/y/z", hw_x, hw_y, hw_z)
-    print("ww_x/y/z", ww_x, ww_y, ww_z)
 
     ax = ax.subs([(Tx, Tx), (Iy, Iyy), (Iz, Izz), (wz, ww_z), (wy, ww_y), (hw_z, hw_z), (hw_y, hw_y), (Ix, Ixx)])
     ay = ay.subs([(Ty, Ty), (Iz, Izz), (Ix, Ixx), (wx, ww_x), (wz, ww_z), (hw_x, hw_x), (hw_z, hw_z), (Iy, Iyy)])
-    az = az.subs([(Tz, Tz), (Ix, Ixx), (Iy, Iyy), (wy, ww_y), (wx, ww_x), (hw_y, hw_y), (hw_x, hw_x), (Iz, Izz)])
+    az = az.subs([(Tz, Tz), (Iy, Iyy), (Ix, Ixx), (wy, ww_y), (wx, ww_x), (hw_y, hw_y), (hw_x, hw_x), (Iz, Izz)])
 
     eq_wx = sympy.integrate(ax, (t, 0, time))
     eq_wy = sympy.integrate(ay, (t, 0, time))
