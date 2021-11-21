@@ -11,7 +11,7 @@ import mathutils
 qtest = q.Quaternion(1, 0, 0, 0)
 direction = True
 x = 0
-while x < 10:
+while x < 1:
    
     print(qtest)
     aVel.setAngVar(qtest) #does this need to be quaternion?
@@ -19,8 +19,11 @@ while x < 10:
     torque = magT.calcTorque(magf)
     torqueAR = np.array([torque[0], torque[1], torque[2]])
  
+    dir_magx = True
+    dir_magy = True
+    dir_magz = True
     
-    omega = magT.controlSysMag(torqueAR, qtest, direction)
+    omega = magT.controlSysMag(torqueAR, qtest, dir_magx, dir_magy, dir_magz)
     aVel.setAngVar(omega)
     print("ang var", aVel.getAngVar())
     print("torque that matters", torqueAR)

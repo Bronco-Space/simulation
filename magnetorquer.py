@@ -71,12 +71,13 @@ def calcTorque(magf):
     # bpy.ops.transform.translate(value = vector_global_point)
     #magVectorPoint.location = vector_global_point #Solely for illustration purposes set an empty at the global coordinates of the vector end. An empty in the simulation is set to track magVectorPoint
 
-def velCtrl(torque):
+def velCtrl(torque, dir_magx, dir_magy, dir_magz):
     #Cubesat Properties
     cubesat = bpy.data.objects['cubesat']
     m = 1.75 #kg
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
-    
+
+
     print("torque dimensions", torque.shape)
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
     Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
@@ -109,27 +110,28 @@ def velCtrl(torque):
     eq_wy = sympy.integrate(ay, (t, 0, time))
     eq_wz = sympy.integrate(az, (t, 0, time))
 
-    eq_wx = sympy.Eq(eq_wx, wx)
-    eq_wy = sympy.Eq(eq_wy, wy)
-    eq_wz = sympy.Eq(eq_wz, wz)
+    eq_wx = eq_wx - wx
+    eq_wy = eq_wy - wy
+    eq_wz = eq_wz - wz
 
-
-    ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
+    eqns = [eq_wx, eq_wy, eq_wz]
+    ans = list(sympy.nonlinsolve(eqns, wx,wy,wz))
     print("these are the rads", ans)
+    
+    print("this is a", ans[0][0])
+    if dir_magx == True: -ans[0][0]
+    if dir_magy == True: -ans[0][1]
+    if dir_magz == True: -ans[0][2]
 
-    if (cubesat.get("magX")) > 0: -ans[0][wx]
-    if (cubesat.get("magY")) > 0: -ans[0][wy]
-    if (cubesat.get("magZ")) > 0: -ans[0][wz]
-
-    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
-    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
-    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][wz]).normalised
+    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][0]).normalised
+    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][1]).normalised
+    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][2]).normalised
         
     omegaQ = (qx*qy*qz).normalised 
     print("print", omegaQ)
     return omegaQ
 
-def reactWhl(Tm): 
+def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz): 
     #time step
     time = 1
     t = sympy.Symbol("t")
@@ -228,9 +230,9 @@ def reactWhl(Tm):
     ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
     print("ans:", ans)
 
-    if (cubesat.get("dWx")) > 0: -ans[0][wx]
-    if (cubesat.get("dWy")) > 0: -ans[0][wy]
-    if (cubesat.get("dWz")) > 0: -ans[0][wz]
+    if dir_reactx == True: -ans[0][wx]
+    if dir_reacty == True: -ans[0][wy]
+    if dir_reactz == True: -ans[0][wz]
 
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
@@ -238,15 +240,15 @@ def reactWhl(Tm):
     omegaQ = (qx*qy*qz).normalised 
     return omegaQ
 
-def controlSysMag(torque, omega, direction):                                           #direction is a true/false value determined by the ai
+def controlSysMag(torque, omega, dir_magx, dir_magy, dir_magz):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0:
-        omegaT = velCtrl(torque)            
+        omegaT = velCtrl(torque, dir_magx, dir_magy, dir_magz)            
         omegaNF = omega + omegaT #nf = new frame    
     else:         
         omegaNF = omega      
     return omegaNF       
 
-def controlSysReact(torque, omega, direction):                                           #direction is a true/false value determined by the ai
+def controlSysReact(torque, omega):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("dWx")) > 0 or (cubesat.get("dWy")) > 0 or (cubesat.get("dWz")) > 0:
         omegaRW = reactWhl(torque)             
         omegaNF = omega + omegaRW #nf = new frame    
