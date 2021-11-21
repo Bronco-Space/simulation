@@ -76,6 +76,10 @@ def velCtrl(torque):
     cubesat = bpy.data.objects['cubesat']
     m = 1.75 #kg
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
+
+    dir_magx = True
+    dir_magy = True
+    dir_magz = True
     
     print("torque dimensions", torque.shape)
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
@@ -117,9 +121,9 @@ def velCtrl(torque):
     ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
     print("these are the rads", ans)
 
-    if (cubesat.get("magX")) > 0: -ans[0][wx]
-    if (cubesat.get("magY")) > 0: -ans[0][wy]
-    if (cubesat.get("magZ")) > 0: -ans[0][wz]
+    if dir_magx == True: -ans[0][wx]
+    if dir_magy == True: -ans[0][wy]
+    if dir_magz == True: -ans[0][wz]
 
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
@@ -136,6 +140,9 @@ def reactWhl(Tm):
     m = 1.75 #kg
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
     
+    dir_reactx = True
+    dir_reacty = True
+    dir_reactz = True
     
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
     Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
@@ -228,9 +235,9 @@ def reactWhl(Tm):
     ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
     print("ans:", ans)
 
-    if (cubesat.get("dWx")) > 0: -ans[0][wx]
-    if (cubesat.get("dWy")) > 0: -ans[0][wy]
-    if (cubesat.get("dWz")) > 0: -ans[0][wz]
+    if dir_reactx == True: -ans[0][wx]
+    if dir_reacty == True: -ans[0][wy]
+    if dir_reactz == True: -ans[0][wz]
 
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
@@ -238,7 +245,7 @@ def reactWhl(Tm):
     omegaQ = (qx*qy*qz).normalised 
     return omegaQ
 
-def controlSysMag(torque, omega, direction):                                           #direction is a true/false value determined by the ai
+def controlSysMag(torque, omega):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0:
         omegaT = velCtrl(torque)            
         omegaNF = omega + omegaT #nf = new frame    
@@ -246,7 +253,7 @@ def controlSysMag(torque, omega, direction):                                    
         omegaNF = omega      
     return omegaNF       
 
-def controlSysReact(torque, omega, direction):                                           #direction is a true/false value determined by the ai
+def controlSysReact(torque, omega):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("dWx")) > 0 or (cubesat.get("dWy")) > 0 or (cubesat.get("dWz")) > 0:
         omegaRW = reactWhl(torque)             
         omegaNF = omega + omegaRW #nf = new frame    
