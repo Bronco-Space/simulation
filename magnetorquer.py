@@ -113,7 +113,9 @@ def velCtrl(torque, dir_magx, dir_magy, dir_magz):
     eq_wx = eq_wx - wx
     eq_wy = eq_wy - wy
     eq_wz = eq_wz - wz
-
+    print("eqx", eq_wx)
+    print("eqy", eq_wy)
+    print("eqz", eq_wz)
     eqns = [eq_wx, eq_wy, eq_wz]
     ans = list(sympy.nonlinsolve(eqns, wx,wy,wz))
     print("these are the rads", ans)
