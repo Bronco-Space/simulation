@@ -75,16 +75,41 @@ def velCtrl(torque, dir_magx, dir_magy, dir_magz):
     #Cubesat Properties
     cubesat = bpy.data.objects['cubesat']
     m = 1.75 #kg
+    Tx = torque[0]
+    Ty = torque[1]
+    Tz = torque[2]
+    print("torque", torque)
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
+    #assumed the timestep is 1 second
+    wx_mag =(Tx)/((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+ 
+    wy_mag =(Ty)/((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+ 
+    wz_mag =(Tz)/((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+ 
+    
+    ans = [wx_mag, wy_mag, wz_mag]
+    print(ans)
+    print("yay", ((1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)))
+    if dir_magx == True: -ans[0]
+    if dir_magy == True: -ans[1]
+    if dir_magz == True: -ans[2]
 
+    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0]).normalised
+    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[1]).normalised
+    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[2]).normalised
+        
+    omegaQ = (qx*qy*qz).normalised 
+    print("print", omegaQ)
+    return omegaQ
 
-    print("torque dimensions", torque.shape)
+'''
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
     Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
     Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
 
-  
-
+    
+    
     time = 1 #timestep
     t = sympy.symbols("t")
 
@@ -119,21 +144,10 @@ def velCtrl(torque, dir_magx, dir_magy, dir_magz):
     eqns = [eq_wx, eq_wy, eq_wz]
     ans = list(sympy.nonlinsolve(eqns, wx,wy,wz))
     print("these are the rads", ans)
+'''
     
-    print("this is a", ans[0][0])
-    if dir_magx == True: -ans[0][0]
-    if dir_magy == True: -ans[0][1]
-    if dir_magz == True: -ans[0][2]
 
-    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][0]).normalised
-    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][1]).normalised
-    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][2]).normalised
-        
-    omegaQ = (qx*qy*qz).normalised 
-    print("print", omegaQ)
-    return omegaQ
-
-def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz): 
+def reactWhl(Tm): 
     #time step
     time = 1
     t = sympy.Symbol("t")
@@ -141,10 +155,12 @@ def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz):
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
     
     
-    Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
-    Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
-    Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
-
+    #Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
+    #Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
+    #Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
+    Ix = ((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+    Iy = ((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+    Iz = ((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
     #board properties
     board_current = 0.8
     max_angvel = 12000
@@ -162,7 +178,7 @@ def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz):
     m = 0.120 #mass of wheel (kg)
     r = 0.025 #radius of wheel (m)
     d = 0.005 #wheel density
-
+    '''
     #moment of inertia of satellite's body (diagonal)
     Ix, Iy, Iz = sympy.symbols("Ix Iy Iz")
 
@@ -180,7 +196,7 @@ def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz):
 
     #angular velocity
     wx, wy, wz = sympy.symbols("wx wy wz")
-
+    '''
     #calculate current from duty cycle
     i_x = (dc_x*board_current)
     i_y = (dc_y*board_current)
@@ -190,7 +206,7 @@ def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz):
     Tw_x = Kt*i_x
     Tw_y = Kt*i_y
     Tw_z = Kt*i_z
-
+    print("Tw_x", Tw_x)
     #calculate wheel angular velocity 
     
     #RPM to rad/s -> multiply by pi/30
@@ -202,11 +218,18 @@ def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz):
     hw_x =  (((0.5)*m*(r**2)) + (m*(d**2)))*ww_x
     hw_y =  (((0.5)*m*(r**2)) + (m*(d**2)))*ww_y
     hw_z =  (((0.5)*m*(r**2)) + (m*(d**2)))*ww_z
-
+    print("hx", hw_x)
+    print("hy", hw_y)
+    print("hz", hw_z)
+    print("torque", Tm)
+    
+    Tx = Tm[0] - Tw_x
+    Ty = Tm[1] - Tw_y
+    Tz = Tm[2] - Tw_z
+    '''
+    
     #T = Tm - Tw
-    Tx = Tm_x - Tw_x
-    Ty = Tm_y - Tw_y
-    Tz = Tm_z - Tw_z
+    
 
     Tx = Tx.subs([(Tm_x, Tm[0]), (Tw_x, Tw_x)])
     Ty = Ty.subs([(Tm_y, Tm[1]), (Tw_y, Tw_y)])
@@ -230,15 +253,24 @@ def reactWhl(Tm, dir_reactx, dir_reacty, dir_reactz):
     eq_wz = sympy.Eq(eq_wz, wz)
     
     ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
+    '''
+    wx = (Tx*np.power(hw_x,2) + Iy*Iz*Tx - Iy*Tz*hw_y + Iz*Ty*hw_z + Ty*hw_x*hw_y + Tz*hw_x*hw_z)/(Ix*np.power(hw_x,2) + Iy*np.power(hw_y,2) + Iz*np.power(hw_z,2) + Ix*Iy*Iz)
+    print("hwx^2",np.power(hw_x,2) )
+ 
+    wy = (Ty*np.power(hw_y,2) + Ix*Iz*Ty + Ix*Tz*hw_x - Iz*Tx*hw_z + Tx*hw_x*hw_y + Tz*hw_y*hw_z)/(Ix*np.power(hw_x,2) + Iy*np.power(hw_y,2) + Iz*np.power(hw_z,2) + Ix*Iy*Iz)
+ 
+ 
+    wz = (Tz*np.power(hw_z,2) + Ix*Iy*Tz - Ix*Ty*hw_x + Iy*Tx*hw_y + Tx*hw_x*hw_z + Ty*hw_y*hw_z)/(Ix*np.power(hw_x,2) + Iy*np.power(hw_y,2) + Iz*np.power(hw_z,2) + Ix*Iy*Iz)
+    ans = [wx, wy, wz]
     print("ans:", ans)
 
-    if dir_reactx == True: -ans[0][wx]
-    if dir_reacty == True: -ans[0][wy]
-    if dir_reactz == True: -ans[0][wz]
+    if dc_x == True: -ans[0]
+    if dc_y == True: -ans[1]
+    if dc_z == True: -ans[2]
 
-    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][wx]).normalised
-    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][wy]).normalised
-    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][wz]).normalised
+    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0]).normalised
+    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[1]).normalised
+    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[2]).normalised
     omegaQ = (qx*qy*qz).normalised 
     return omegaQ
 

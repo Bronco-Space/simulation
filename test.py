@@ -23,7 +23,8 @@ while x < 1:
     dir_magy = True
     dir_magz = True
     
-    omega = magT.controlSysMag(torqueAR, qtest, dir_magx, dir_magy, dir_magz)
+    #omega = magT.controlSysMag(torqueAR, qtest, dir_magx, dir_magy, dir_magz)
+    omega = magT.controlSysReact(torqueAR, qtest)
     aVel.setAngVar(omega)
     print("ang var", aVel.getAngVar())
     print("torque that matters", torqueAR)
