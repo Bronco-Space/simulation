@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# project specific ones
+*.blend1
+packages/
+
 # C extensions
 *.so
 
