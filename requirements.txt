@@ -1,3 +1,4 @@
 pyIGRF
 pyquaternion
 scipy
+sympy
