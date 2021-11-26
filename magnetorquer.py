@@ -71,19 +71,45 @@ def calcTorque(magf):
     # bpy.ops.transform.translate(value = vector_global_point)
     #magVectorPoint.location = vector_global_point #Solely for illustration purposes set an empty at the global coordinates of the vector end. An empty in the simulation is set to track magVectorPoint
 
-def velCtrl(torque):
+def velCtrl(torque, dir_magx, dir_magy, dir_magz):
     #Cubesat Properties
     cubesat = bpy.data.objects['cubesat']
     m = 1.75 #kg
+    Tx = torque[0]
+    Ty = torque[1]
+    Tz = torque[2]
+    print("torque", torque)
     #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
+    #assumed the timestep is 1 second
+    wx_mag =(Tx)/((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+ 
+    wy_mag =(Ty)/((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+ 
+    wz_mag =(Tz)/((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+ 
     
-    print("torque dimensions", torque.shape)
+    ans = [wx_mag, wy_mag, wz_mag]
+    print(ans)
+    print("yay", ((1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)))
+    if dir_magx == True: -ans[0]
+    if dir_magy == True: -ans[1]
+    if dir_magz == True: -ans[2]
+
+    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0]).normalised
+    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[1]).normalised
+    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[2]).normalised
+        
+    omegaQ = (qx*qy*qz).normalised 
+    print("print", omegaQ)
+    return omegaQ
+
+'''
     Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
     Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
     Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
 
-  
-
+    
+    
     time = 1 #timestep
     t = sympy.symbols("t")
 
@@ -92,7 +118,7 @@ def velCtrl(torque):
     wx, wy, wz = sympy.symbols("wx wy wz")
     
 
-    alx, aly, alz = sympy.symbols("alx, aly, alz")
+    ax, ay, az = sympy.symbols("ax, ay, az")
     
     Tx, Ty, Tz = sympy.symbols("Tx, Ty, Tz")
     
@@ -109,32 +135,157 @@ def velCtrl(torque):
     eq_wy = sympy.integrate(ay, (t, 0, time))
     eq_wz = sympy.integrate(az, (t, 0, time))
 
+    eq_wx = eq_wx - wx
+    eq_wy = eq_wy - wy
+    eq_wz = eq_wz - wz
+    print("eqx", eq_wx)
+    print("eqy", eq_wy)
+    print("eqz", eq_wz)
+    eqns = [eq_wx, eq_wy, eq_wz]
+    ans = list(sympy.nonlinsolve(eqns, wx,wy,wz))
+    print("these are the rads", ans)
+'''
+    
+
+def reactWhl(Tm): 
+    #time step
+    time = 1
+    t = sympy.Symbol("t")
+    m = 1.75 #kg
+    #Ixx, Iyy, Izz pull data from the cubesat object, and assuming a rectangular prism for moment of inertia calculations
+    
+    
+    #Ixx = (1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)
+    #Iyy = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.z)**2)
+    #Izz = (1/12)*(m)*((cubesat.dimensions.x)**2 + (cubesat.dimensions.y)**2)
+    Ix = ((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+    Iy = ((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+    Iz = ((1/12)*m*(np.power(0.1,2)+np.power(0.1,2)))
+    #board properties
+    board_current = 0.8
+    max_angvel = 12000
+
+    #duty cycle for wheels
+    dc_x = convertDutyCycle(cubesat.get("dWx"))
+    dc_y = convertDutyCycle(cubesat.get("dWy"))
+    dc_z = convertDutyCycle(cubesat.get("dWz"))
+
+    #wheel specs
+    i_x = 1 #average current going into x-axis motor [A]
+    i_y = 1 #average current going through y-axis motor [A]
+    i_z = 1 #average current going through z-axis motor [A]
+    Kt = 0.001 #torque constant of wheel (Nm) at nominal momentum (0.01Nms)
+    m = 0.120 #mass of wheel (kg)
+    r = 0.025 #radius of wheel (m)
+    d = 0.005 #wheel density
+    '''
+    #moment of inertia of satellite's body (diagonal)
+    Ix, Iy, Iz = sympy.symbols("Ix Iy Iz")
+
+    #reaction wheel angular momentum
+    hw_x, hw_y, hw_z = sympy.symbols("hw_x hw_y hw_z")
+
+    #applied reaction wheel torques
+    Tw_x, Tw_y, Tw_z = sympy.symbols("Tw_x Tw_y Tw_z")
+
+    #magnetic torque vector induced by magnetorquers
+    Tm_x, Tm_y, Tm_z = sympy.symbols("Tw_x Tw_y Tw_z")
+
+    #total torque
+    Tx, Ty, Tz = sympy.symbols("Tx Ty Tz")
+
+    #angular velocity
+    wx, wy, wz = sympy.symbols("wx wy wz")
+    '''
+    #calculate current from duty cycle
+    i_x = (dc_x*board_current)
+    i_y = (dc_y*board_current)
+    i_z = (dc_z*board_current)
+
+    #calculate Tw
+    Tw_x = Kt*i_x
+    Tw_y = Kt*i_y
+    Tw_z = Kt*i_z
+    print("Tw_x", Tw_x)
+    #calculate wheel angular velocity 
+    
+    #RPM to rad/s -> multiply by pi/30
+    ww_x = (dc_x*max_angvel)*np.pi/30
+    ww_y = (dc_y*max_angvel)*np.pi/30
+    ww_z = (dc_z*max_angvel)*np.pi/30
+
+    #calculate hw
+    hw_x =  (((0.5)*m*(r**2)) + (m*(d**2)))*ww_x
+    hw_y =  (((0.5)*m*(r**2)) + (m*(d**2)))*ww_y
+    hw_z =  (((0.5)*m*(r**2)) + (m*(d**2)))*ww_z
+    print("hx", hw_x)
+    print("hy", hw_y)
+    print("hz", hw_z)
+    print("torque", Tm)
+    
+    Tx = Tm[0] - Tw_x
+    Ty = Tm[1] - Tw_y
+    Tz = Tm[2] - Tw_z
+    '''
+    
+    #T = Tm - Tw
+    
+
+    Tx = Tx.subs([(Tm_x, Tm[0]), (Tw_x, Tw_x)])
+    Ty = Ty.subs([(Tm_y, Tm[1]), (Tw_y, Tw_y)])
+    Tz = Tz.subs([(Tm_z, Tm[2]), (Tw_z, Tw_z)])
+    
+    
+    ax = (Tx - ((Iy - Iz)*wz*wy) + (hw_z*wy) - (hw_y*wz))/Ix
+    ay = (Ty - ((Iz - Ix)*wx*wz) + (hw_x*wz) - (hw_z*wx))/Iy
+    az = (Tz - ((Ix - Iy)*wy*wx) + (hw_y*wx) - (hw_x*wy))/Iz
+
+    ax = ax.subs([(Tx, Tx), (Iy, Iyy), (Iz, Izz), (wz, ww_z), (wy, ww_y), (hw_z, hw_z), (hw_y, hw_y), (Ix, Ixx)])
+    ay = ay.subs([(Ty, Ty), (Iz, Izz), (Ix, Ixx), (wx, ww_x), (wz, ww_z), (hw_x, hw_x), (hw_z, hw_z), (Iy, Iyy)])
+    az = az.subs([(Tz, Tz), (Iy, Iyy), (Ix, Ixx), (wy, ww_y), (wx, ww_x), (hw_y, hw_y), (hw_x, hw_x), (Iz, Izz)])
+
+    eq_wx = sympy.integrate(ax, (t, 0, time))
+    eq_wy = sympy.integrate(ay, (t, 0, time))
+    eq_wz = sympy.integrate(az, (t, 0, time))
+
     eq_wx = sympy.Eq(eq_wx, wx)
     eq_wy = sympy.Eq(eq_wy, wy)
     eq_wz = sympy.Eq(eq_wz, wz)
+    
+    ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz), dict = True)
+    '''
+    wx = (Tx*np.power(hw_x,2) + Iy*Iz*Tx - Iy*Tz*hw_y + Iz*Ty*hw_z + Ty*hw_x*hw_y + Tz*hw_x*hw_z)/(Ix*np.power(hw_x,2) + Iy*np.power(hw_y,2) + Iz*np.power(hw_z,2) + Ix*Iy*Iz)
+    print("hwx^2",np.power(hw_x,2) )
+ 
+    wy = (Ty*np.power(hw_y,2) + Ix*Iz*Ty + Ix*Tz*hw_x - Iz*Tx*hw_z + Tx*hw_x*hw_y + Tz*hw_y*hw_z)/(Ix*np.power(hw_x,2) + Iy*np.power(hw_y,2) + Iz*np.power(hw_z,2) + Ix*Iy*Iz)
+ 
+ 
+    wz = (Tz*np.power(hw_z,2) + Ix*Iy*Tz - Ix*Ty*hw_x + Iy*Tx*hw_y + Tx*hw_x*hw_z + Ty*hw_y*hw_z)/(Ix*np.power(hw_x,2) + Iy*np.power(hw_y,2) + Iz*np.power(hw_z,2) + Ix*Iy*Iz)
+    ans = [wx, wy, wz]
+    print("ans:", ans)
 
+    if dc_x == True: -ans[0]
+    if dc_y == True: -ans[1]
+    if dc_z == True: -ans[2]
 
-    ans = sympy.solve([eq_wx, eq_wy, eq_wz], (wx,wy,wz))
-
-    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0][0]).normalised
-    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[0][1]).normalised
-    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[0][2]).normalised
-        
+    qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0]).normalised
+    qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[1]).normalised
+    qz = q.Quaternion(axis=(0.0, 0.0, 1.0), radians = ans[2]).normalised
     omegaQ = (qx*qy*qz).normalised 
-    print("print", omegaQ)
     return omegaQ
 
-
-def controlSys(torque, omega, direction):                                           #direction is a true/false value determined by the ai
+def controlSysMag(torque, omega, dir_magx, dir_magy, dir_magz):                                           #direction is a true/false value determined by the ai
     if (cubesat.get("magX")) > 0 or (cubesat.get("magY")) > 0 or (cubesat.get("magZ")) > 0:
-       
-        omegaT = velCtrl(torque)    
-        
-        if direction == True:          
-            omegaNF = omega - omegaT #nf = new frame    
-        else:
-            omegaNF = omega + omegaT
+        omegaT = velCtrl(torque, dir_magx, dir_magy, dir_magz)            
+        omegaNF = omega + omegaT #nf = new frame    
     else:         
         omegaNF = omega      
-    
+    return omegaNF       
+
+def controlSysReact(torque, omega):                                           #direction is a true/false value determined by the ai
+    if (cubesat.get("dWx")) > 0 or (cubesat.get("dWy")) > 0 or (cubesat.get("dWz")) > 0:
+        omegaRW = reactWhl(torque)             
+        omegaNF = omega + omegaRW #nf = new frame    
+    else:         
+        omegaNF = omega      
     return omegaNF       
