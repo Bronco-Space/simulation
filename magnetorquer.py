@@ -91,9 +91,9 @@ def velCtrl(torque, dir_magx, dir_magy, dir_magz):
     ans = [wx_mag, wy_mag, wz_mag]
     print(ans)
     print("yay", ((1/12)*(m)*((cubesat.dimensions.y)**2 + (cubesat.dimensions.z)**2)))
-    if dir_magx == True: -ans[0]
-    if dir_magy == True: -ans[1]
-    if dir_magz == True: -ans[2]
+    if dir_magx == True: ans = -1*ans[0]
+    if dir_magy == True: ans = -1*ans[1]
+    if dir_magz == True: ans = -1*ans[2]
 
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[1]).normalised
@@ -264,9 +264,9 @@ def reactWhl(Tm):
     ans = [wx, wy, wz]
     print("ans:", ans)
 
-    if dc_x == True: -ans[0]
-    if dc_y == True: -ans[1]
-    if dc_z == True: -ans[2]
+    if dc_x == True: ans = -1*ans[0]
+    if dc_y == True: ans = -1*ans[1]
+    if dc_z == True: ans = -1*ans[2]
 
     qx = q.Quaternion(axis=(1.0, 0.0, 0.0), radians = ans[0]).normalised
     qy = q.Quaternion(axis=(0.0, 1.0, 0.0), radians = ans[1]).normalised
