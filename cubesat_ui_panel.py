@@ -66,7 +66,9 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         # Altitude
         col = layout.column(align=True)
         diffVector = bpy.data.objects['Earth'].matrix_world.translation - bpy.data.objects['cubesat'].matrix_world.translation
-        col.label(text='Altitude: {:>10.3f}'.format(numpy.linalg.norm(diffVector)))
+        orbitRadius = (bpy.data.objects['Orbit'].data.splines[0].bezier_points[0].co - bpy.data.objects['Orbit'].data.splines[0].bezier_points[2].co).length / 2    # bezier_points 0 and 2 are opposing points on the circle
+        earthRadius = (bpy.data.objects['EarthSurface'].data.vertices[205].co - bpy.data.objects['EarthSurface'].data.vertices[296].co).length / 2                  # Vertices 205 and 296 are the poles of a default UV sphere
+        col.label(text='Altitude: {:>10.3f}'.format((orbitRadius - earthRadius)*10000))
         
 	    # Center of mass readout. Note: assumes center of mass's name is 'centerofmass'
         col = layout.column(align=True)
@@ -87,7 +89,7 @@ class VIEW3D_PT_cubesat(bpy.types.Panel):
         col.label(text=f'z:{round(acc.z, 3)}')
 
         # Readout of magnetic properties
-        magf = mag.get_magnetic_force(bpy.data.objects['cubesat'].location)
+        magf = mag.get_magnetic_force(bpy.data.objects["cubesat"].matrix_world @ bpy.data.objects['cubesat'].location)
         col = layout.column(align=True)
         col.label(text='North component: {:>+10.3f}'.format(magf[0]))
         col.label(text='East component: {:>+10.3f}'.format(magf[1]))

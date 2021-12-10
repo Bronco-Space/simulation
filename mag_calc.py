@@ -8,9 +8,9 @@ def get_magnetic_force(location):
     # altitude in this function is the distance from the earth's surface.
     # returns a vector in NED coordinate system with 3 components and 1 magnitude.
     
-    x, y, z = location
-    year = 2021
-    earth_radius = 635.7 #* 10000 # m
+    x, y, z = location * 10000
+    year = 2015
+    earth_radius = 635.7 * 10000 # m
     
     alt = math.sqrt(x**2 + y**2 + z**2) - earth_radius
     thetaE = math.acos(z/alt)
@@ -19,7 +19,7 @@ def get_magnetic_force(location):
     lon = psiE * 180 / math.pi
     alt_km = alt / 1000
     
-    md, mi, mh, mx, my, mz, mf = pyIGRF.igrf_value(lat,lon,alt,year)
+    md, mi, mh, mx, my, mz, mf = pyIGRF.igrf_value(lat,lon,alt_km,year)
     # md - declination (+ve east)
     # mi - inclination
     # mh - horizontal intensity
